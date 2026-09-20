@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#755139" />
+  <title>ZALVRA Admin Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #755139; --gold: #9a7355; --bg: #F2EDD7; --border: #e0d5c0;
+      --muted: #8a6f5a; --text: #4a3224; --danger: #c62828; --success: #2e7d32;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; }
+    .admin-header {
+      background: var(--primary); color: white; padding: 1rem 1.5rem;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem;
+    }
+    .admin-header h1 { font-size: 1.25rem; font-weight: 500; letter-spacing: 2px; }
+    .admin-header a, .admin-header button {
+      background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white;
+      padding: 0.4rem 0.9rem; font-size: 0.8rem; cursor: pointer; font-family: inherit; text-decoration: none;
+    }
+    .admin-header a:hover, .admin-header button:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ===== Login screen (glass + landscape) ===== */
+    body.login-mode {
+      background:
+        linear-gradient(160deg, rgba(45, 20, 80, 0.55), rgba(90, 40, 120, 0.45)),
+        url('https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat fixed;
+      min-height: 100vh;
+    }
+    body.login-mode .admin-header { display: none; }
+    .login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .login-box {
+      width: 100%;
+      max-width: 380px;
+      padding: 2.75rem 2.25rem 2.25rem;
+      text-align: center;
+      border-radius: 28px;
+      background: linear-gradient(165deg, rgba(255, 180, 220, 0.28), rgba(160, 120, 220, 0.22));
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 0 20px 50px rgba(40, 10, 60, 0.35);
+      color: #fff;
+    }
+    .login-box .brand {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 0.85rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      opacity: 0.85;
+      margin-bottom: 0.75rem;
+    }
+    .login-box h2 {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+    .login-box .form-group { margin-bottom: 1.4rem; text-align: left; }
+    .login-box .form-group label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0;
+      text-transform: none;
+      margin-bottom: 0.45rem;
+      color: rgba(255,255,255,0.95);
+    }
+    .login-box .form-group input {
+      width: 100%;
+      padding: 0.55rem 0;
+      border: none;
+      border-bottom: 1.5px solid rgba(255,255,255,0.55);
+      border-radius: 0;
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      background: transparent;
+      color: #fff;
+    }
+    .login-box .form-group input::placeholder { color: rgba(255,255,255,0.45); }
+    .login-box .form-group input:focus {
+      border-bottom-color: #fff;
+      background: transparent;
+    }
+    .login-options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin: 0.5rem 0 1.6rem;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.9);
+      flex-wrap: wrap;
+    }
+    .login-options label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      font-weight: 400;
+    }
+    .login-options input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      accent-color: #fff;
+    }
+    .login-options a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+      border-bottom: 1px solid rgba(255,255,255,0.4);
+    }
+    .login-options a:hover { border-bottom-color: #fff; }
+    .login-btn {
+      width: 100%;
+      border: none;
+      border-radius: 999px;
+      padding: 0.85rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      background: #fff;
+      color: #5b3a8c;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .login-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+    }
+    .login-box .error {
+      color: #ffd6d6;
+      font-size: 0.85rem;
+      margin-top: 0.85rem;
+      display: none;
+    }
+    .login-footer {
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.85);
+    }
+    .login-footer a {
+      color: #fff;
+      font-weight: 600;
+      text-decoration: none;
+      margin-left: 0.25rem;
+    }
+
+    .form-group { margin-bottom: 1rem; text-align: left; }
+    .form-group label {
+      display: block; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.5px;
+      text-transform: uppercase; margin-bottom: 0.35rem;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 0.7rem 0.9rem; border: 1px solid var(--border);
+      font-size: 0.9rem; font-family: inherit; outline: none; background: #f7f3e8;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); }
+    .form-group textarea { resize: vertical; min-height: 70px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+    .image-upload-area {
+      border: 2px dashed var(--border); padding: 1rem; text-align: center; background: #f7f3e8;
+      cursor: pointer; transition: border-color 0.2s;
+    }
+    .image-upload-area:hover, .image-upload-area.dragover { border-color: var(--gold); }
+    .image-upload-area input[type="file"] { display: none; }
+    .image-previews { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.8rem; }
+    .image-preview {
+      position: relative; width: 72px; height: 72px; border: 1px solid var(--border);
+      background: #ebe4d4; overflow: hidden;
+    }
+    .image-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .image-preview .remove-img {
+      position: absolute; top: 2px; right: 2px; background: var(--danger); color: white;
+      border: none; width: 18px; height: 18px; font-size: 0.7rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; line-height: 1;
+    }
+    .upload-hint { font-size: 0.8rem; color: var(--muted); margin-top: 0.4rem; }
+    .upload-status { font-size: 0.8rem; color: var(--gold); margin-top: 0.4rem; }
+    .btn {
+      background: var(--primary); color: white; border: none; padding: 0.75rem 1.4rem;
+      font-size: 0.8rem; font-weight: 500; letter-spacing: 1px; text-transform: uppercase;
+      cursor: pointer; font-family: inherit; transition: background 0.2s;
+    }
+    .btn:hover { background: var(--gold); color: var(--primary); }
+    .btn-full { width: 100%; }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.75rem; letter-spacing: 0.5px; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--gold); color: var(--gold); background: transparent; }
+    .btn-danger { background: var(--danger); }
+    .btn-danger:hover { background: #b71c1c; color: white; }
+    .hint { margin-top: 1rem; font-size: 0.8rem; color: #aaa; }
+    .error { color: var(--danger); font-size: 0.85rem; margin-top: 0.6rem; display: none; }
+    .dashboard { display: none; }
+    body:not(.login-mode) .login-screen { display: none; }
+    .content { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+    .tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+    .tab {
+      padding: 0.8rem 1.4rem; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.5px;
+      text-transform: uppercase; cursor: pointer; border: none; background: none;
+      color: var(--muted); border-bottom: 2px solid transparent; font-family: inherit;
+    }
+    .tab.active { color: var(--primary); border-bottom-color: var(--gold); }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+    .stat-card { background: white; padding: 1.3rem; border: 1px solid var(--border); text-align: center; }
+    .stat-card .num { font-size: 1.8rem; font-weight: 600; font-family: 'Playfair Display', serif; }
+    .stat-card .lbl { font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-top: 0.25rem; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.8rem; }
+    .toolbar h2 { font-size: 1.2rem; font-weight: 500; }
+    table { width: 100%; background: white; border: 1px solid var(--border); border-collapse: collapse; font-size: 0.88rem; }
+    th {
+      text-align: left; padding: 0.85rem; background: #ebe4d4; font-size: 0.72rem;
+      letter-spacing: 1px; text-transform: uppercase; font-weight: 600; border-bottom: 1px solid var(--border);
+    }
+    td { padding: 0.85rem; border-bottom: 1px solid #f0ece6; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    .status {
+      display: inline-block; padding: 0.2rem 0.55rem; font-size: 0.72rem;
+      font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    .status-new { background: #e8f5e9; color: #2e7d32; }
+    .status-processing { background: #fff3e0; color: #e65100; }
+    .status-shipped { background: #e3f2fd; color: #1565c0; }
+    .status-done { background: #f5f5f5; color: #757575; }
+    .status-cancelled { background: #ffebee; color: #c62828; }
+    .actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .empty { text-align: center; padding: 2.5rem; color: var(--muted); background: white; border: 1px solid var(--border); }
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 100;
+      display: none; align-items: center; justify-content: center; padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: white; width: 100%; max-width: 520px; max-height: 90vh;
+      overflow-y: auto; padding: 2rem; position: relative;
+    }
+    .modal h2 { font-size: 1.3rem; font-weight: 500; margin-bottom: 1.2rem; }
+    .modal-close {
+      position: absolute; top: 1rem; right: 1rem; background: none; border: none;
+      font-size: 1.3rem; cursor: pointer; color: var(--muted);
+    }
+    .config-box { background: white; border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem; }
+    .config-box h3 { font-size: 1rem; margin-bottom: 0.8rem; font-family: 'Inter', sans-serif; font-weight: 600; }
+    .config-box p { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.8rem; line-height: 1.5; }
+    .config-status { display: inline-block; padding: 0.25rem 0.6rem; font-size: 0.75rem; font-weight: 500; margin-top: 0.5rem; }
+    .config-ok { background: #e8f5e9; color: #2e7d32; }
+    .config-off { background: #fff3e0; color: #e65100; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--primary); color: white; padding: 0.8rem 1.5rem; font-size: 0.9rem;
+      z-index: 200; opacity: 0; transition: all 0.3s; border: 1px solid rgba(201,169,110,0.3);
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    @media (max-width: 768px) {
+      .content { padding: 1rem; }
+      .stats { grid-template-columns: 1fr; gap: 0.75rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .tab { padding: 0.75rem 1rem; white-space: nowrap; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      table { font-size: 0.78rem; display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      th, td { padding: 0.65rem 0.5rem; }
+      .modal { padding: 1.35rem 1.1rem; max-height: 92vh; }
+      .form-group input, .form-group select, .form-group textarea { font-size: 16px; }
+      .login-box { margin: 0; padding: 2.25rem 1.5rem 1.75rem; border-radius: 24px; }
+      .login-box h2 { font-size: 1.75rem; margin-bottom: 1.5rem; }
+      .actions { flex-direction: column; }
+      .btn-sm { width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body class="login-mode">
+  <div class="admin-header" id="adminHeader" style="display:none;">
+    <h1>ZALVRA Admin</h1>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <a href="index.html">← Store</a>
+      <button id="logoutBtn" style="display:none;" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div id="loginBox" class="login-screen">
+    <div class="login-box">
+      <div class="brand">ZALVRA</div>
+      <h2>Login</h2>
+      <div class="form-group">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" placeholder="Enter your email" autocomplete="username" onkeyup="if(event.key==='Enter')login()">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" onkeyup="if(event.key==='Enter')login()">
+      </div>
+      <div class="login-options">
+        <label><input type="checkbox" id="rememberMe"> Remember Me</label>
+        <a href="#" onclick="event.preventDefault(); showToast('Contact store owner to reset');">Forget Password</a>
+      </div>
+      <button type="button" class="login-btn" onclick="login()">Log in</button>
+      <p class="error" id="loginError">Incorrect email or password.</p>
+      <p class="login-footer">Admin access only · <a href="index.html">Back to Store</a></p>
+    </div>
+  </div>
+
+  <div id="dashboard" class="dashboard">
+    <div class="content">
+      <div class="config-box">
+        <h3>Google Sheets Database</h3>
+        <p>Paste your Google Apps Script Web App URL. Orders &amp; products sync to your Sheet. Leave empty for local storage only.</p>
+        <div class="form-group">
+          <label>Apps Script URL</label>
+          <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/AKfycbx1lCxSTfRbzJ4ffvtGtrirf7NuT1CfmvnpEl6oHJvDpJ1H0uucKQEXwzW7JcnOgn-i/exec">
+        </div>
+        <button class="btn btn-sm" onclick="saveScriptUrl()">Save URL</button>
+        <button class="btn btn-sm btn-outline" onclick="testConnection()" style="margin-left:0.4rem;">Test Connection</button>
+        <div id="configStatus" class="config-status config-off">Local mode (no Google Sheet connected)</div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="orders" onclick="switchTab('orders')">Orders</button>
+        <button class="tab" data-tab="products" onclick="switchTab('products')">Products</button>
+      </div>
+
+      <div id="panel-orders" class="panel active">
+        <div class="stats">
+          <div class="stat-card"><div class="num" id="statOrders">0</div><div class="lbl">Total Orders</div></div>
+          <div class="stat-card"><div class="num" id="statRevenue">Rs 0</div><div class="lbl">Revenue</div></div>
+          <div class="stat-card"><div class="num" id="statPending">0</div><div class="lbl">Pending</div></div>
+        </div>
+        <div class="toolbar">
+          <h2>Orders</h2>
+          <button class="btn btn-sm btn-outline" onclick="loadOrders()">Refresh</button>
+        </div>
+        <div id="ordersList"></div>
+      </div>
+
+      <div id="panel-products" class="panel">
+        <div class="toolbar">
+          <h2>Products</h2>
+          <button class="btn btn-sm" onclick="openProductModal()">+ Add Product</button>
+        </div>
+        <div id="productsList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="productModal" onclick="if(event.target===this)closeProductModal()">
+    <div class="modal">
+      <button class="modal-close" onclick="closeProductModal()">✕</button>
+      <h2 id="productModalTitle">Add Product</h2>
+      <form id="productForm" onsubmit="saveProduct(event)">
+        <input type="hidden" id="prodId">
+        <div class="form-group"><label>Name *</label><input type="text" id="prodName" required></div>
+        <div class="form-row">
+          <div class="form-group"><label>Price *</label><input type="number" id="prodPrice" step="0.01" min="0" required></div>
+          <div class="form-group"><label>Old Price</label><input type="number" id="prodOldPrice" step="0.01" min="0"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category *</label>
+            <select id="prodCat" required>
+              <option value="men">Men's Clothing</option>
+              <option value="women">Women's Clothing</option>
+              <option value="electronics">Technology</option>
+              <option value="beauty">Beauty</option>
+              <option value="shoes">Footwear</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Emoji</label><input type="text" id="prodEmoji" placeholder="👔" maxlength="4"></div>
+        </div>
+        <div class="form-group"><label>Rating (1-5)</label><input type="number" id="prodRating" step="0.1" min="1" max="5" value="4.5"></div>
+        <div class="form-group"><label>Description</label><textarea id="prodDesc"></textarea></div>
+        <div class="form-group">
+          <label>Product Images</label>
+          <div class="image-upload-area" id="imageUploadArea" onclick="document.getElementById('prodImages').click()">
+            <div>📷 Click or drag images here</div>
+            <div class="upload-hint">Up to 8 images · JPG, PNG, WEBP · Max 32MB each</div>
+            <input type="file" id="prodImages" accept="image/*" multiple onchange="handleImageSelect(event)">
+          </div>
+          <div class="upload-status" id="uploadStatus"></div>
+          <div class="image-previews" id="imagePreviews"></div>
+        </div>
+        <button type="submit" class="btn btn-full" id="prodSubmitBtn">Save Product</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="statusModal" onclick="if(event.target===this)closeStatusModal()">
+    <div class="modal" style="max-width:360px;">
+      <button class="modal-close" onclick="closeStatusModal()">✕</button>
+      <h2>Update Status</h2>
+      <input type="hidden" id="statusOrderId">
+      <div class="form-group">
+        <label>Order Status</label>
+        <select id="statusSelect">
+          <option value="new">New</option>
+          <option value="processing">Processing</option>
+          <option value="shipped">Shipped</option>
+          <option value="done">Done</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <button class="btn btn-full" onclick="updateOrderStatus()">Update</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const ADMIN_EMAIL = 'zalvra@admin.store';
+    const ADMIN_PASS = 'zalvra';
+    const DEFAULT_PRODUCTS = [
+      { id: 1, name: "Classic Oxford Shirt", price: 8900, oldPrice: 12000, cat: "men", emoji: "👔", rating: 4.8, desc: "Premium cotton oxford shirt." },
+      { id: 2, name: "Slim Fit Wool Trousers", price: 14500, oldPrice: null, cat: "men", emoji: "👖", rating: 4.7, desc: "Italian wool trousers." },
+      { id: 3, name: "Leather Bomber Jacket", price: 32000, oldPrice: 39500, cat: "men", emoji: "🧥", rating: 4.9, desc: "Full-grain leather bomber." },
+      { id: 4, name: "Merino Crew Neck", price: 7800, oldPrice: null, cat: "men", emoji: "👕", rating: 4.6, desc: "Ultra-fine merino wool." },
+      { id: 5, name: "Silk Midi Dress", price: 18500, oldPrice: 24000, cat: "women", emoji: "👗", rating: 4.9, desc: "Fluid silk midi dress." },
+      { id: 6, name: "High-Rise Tailored Jeans", price: 12800, oldPrice: null, cat: "women", emoji: "👖", rating: 4.7, desc: "Premium stretch denim." },
+      { id: 7, name: "Cashmere Wrap Coat", price: 39500, oldPrice: 48000, cat: "women", emoji: "🧥", rating: 5.0, desc: "Luxurious cashmere coat." },
+      { id: 8, name: "Silk Blouse", price: 14500, oldPrice: null, cat: "women", emoji: "👚", rating: 4.8, desc: "Pure silk blouse." },
+      { id: 9, name: "Noise-Cancelling Earbuds", price: 24900, oldPrice: 29900, cat: "electronics", emoji: "🎧", rating: 4.8, desc: "Studio-grade sound." },
+      { id: 10, name: "Titanium Smart Watch", price: 44900, oldPrice: 52900, cat: "electronics", emoji: "⌚", rating: 4.9, desc: "Aerospace-grade titanium." },
+      { id: 11, name: "Portable Speaker", price: 17900, oldPrice: null, cat: "electronics", emoji: "🔊", rating: 4.7, desc: "Immersive 360 sound." },
+      { id: 12, name: "GaN Fast Charger", price: 5900, oldPrice: 7500, cat: "electronics", emoji: "🔌", rating: 4.6, desc: "Compact 65W GaN." },
+      { id: 13, name: "Vitamin C Brightening Serum", price: 6800, oldPrice: 8500, cat: "beauty", emoji: "✨", rating: 4.9, desc: "20% vitamin C serum." },
+      { id: 14, name: "Hydra-Restore Cream", price: 7800, oldPrice: null, cat: "beauty", emoji: "🧴", rating: 4.8, desc: "24-hour hydration." },
+      { id: 15, name: "Velvet Matte Lip Collection", price: 4800, oldPrice: 6200, cat: "beauty", emoji: "💄", rating: 4.7, desc: "Five curated shades." },
+      { id: 16, name: "Botanical Hair Elixir", price: 4200, oldPrice: null, cat: "beauty", emoji: "🌿", rating: 4.6, desc: "Rare botanical oils." },
+      { id: 17, name: "Minimal Leather Sneakers", price: 19500, oldPrice: 24500, cat: "shoes", emoji: "👟", rating: 4.8, desc: "Hand-finished leather." },
+      { id: 18, name: "Chelsea Boots", price: 27500, oldPrice: null, cat: "shoes", emoji: "🥾", rating: 4.9, desc: "Full-grain leather boots." },
+      { id: 19, name: "Performance Runners", price: 16500, oldPrice: 19800, cat: "shoes", emoji: "🏃", rating: 4.7, desc: "Engineered cushioning." },
+      { id: 20, name: "Oxford Dress Shoes", price: 24500, oldPrice: null, cat: "shoes", emoji: "👞", rating: 4.8, desc: "Classic polished calf leather." }
+    ];
+
+    
+    function formatPKR(n) {
+      const v = Math.round(Number(n) || 0);
+      return 'Rs ' + v.toLocaleString('en-PK');
+    }
+
+    const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1lCxSTfRbzJ4ffvtGtrirf7NuT1CfmvnpEl6oHJvDpJ1H0uucKQEXwzW7JcnOgn-i/exec';
+
+    let products = [];
+    let orders = [];
+    let scriptUrl = localStorage.getItem('zalvra_script_url') || DEFAULT_SCRIPT_URL;
+    let currentImages = [];
+    const IMGBB_API_KEY = '203fec11c1ddb198f0445772fcb4af5e';
+    const MAX_IMAGES = 8;
+
+    function showDashboard() {
+      document.body.classList.remove('login-mode');
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('adminHeader').style.display = 'flex';
+      document.getElementById('dashboard').style.display = 'block';
+      document.getElementById('logoutBtn').style.display = 'inline-block';
+      document.getElementById('loginError').style.display = 'none';
+      init();
+    }
+
+    function login() {
+      const email = (document.getElementById('loginEmail').value || '').trim().toLowerCase();
+      const pass = document.getElementById('password').value || '';
+      if (email === ADMIN_EMAIL && pass === ADMIN_PASS) {
+        sessionStorage.setItem('zalvra_admin', '1');
+        if (document.getElementById('rememberMe').checked) {
+          localStorage.setItem('zalvra_admin_remember', '1');
+        } else {
+          localStorage.removeItem('zalvra_admin_remember');
+        }
+        showDashboard();
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+      }
+    }
+    function logout() {
+      sessionStorage.removeItem('zalvra_admin');
+      localStorage.removeItem('zalvra_admin_remember');
+      location.reload();
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+      document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    function getScriptUrl() {
+      return (document.getElementById('scriptUrl')?.value || scriptUrl || DEFAULT_SCRIPT_URL || '').trim();
+    }
+
+    async function apiCall(action, data = {}) {
+      const base = getScriptUrl();
+      if (!base) return null;
+      const payload = { action, ...data };
+      const isRead = action === 'ping' || action === 'setup' || action === 'getProducts' || action === 'getOrders';
+
+      async function parseJsonResponse(res) {
+        const text = await res.text();
+        try {
+          return JSON.parse(text);
+        } catch (e) {
+          throw new Error('Invalid response from Sheet API (check deploy: Anyone)');
+        }
+      }
+
+      try {
+        let json;
+        if (isRead) {
+          // GET is most reliable with Apps Script redirects
+          const qs = new URLSearchParams({ action: action });
+          const res = await fetch(base + (base.includes('?') ? '&' : '?') + qs.toString(), { method: 'GET', redirect: 'follow' });
+          json = await parseJsonResponse(res);
+        } else {
+          // Form POST — works better with Google redirects than raw JSON body
+          const form = new URLSearchParams();
+          form.set('action', action);
+          form.set('data', JSON.stringify(payload));
+          let res = await fetch(base, {
+            method: 'POST',
+            redirect: 'follow',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: form.toString()
+          });
+          // Fallback: GET with data (for smaller payloads)
+          const text = await res.text();
+          try {
+            json = JSON.parse(text);
+          } catch (e) {
+            const qs = new URLSearchParams({ action: action, data: JSON.stringify(payload) });
+            res = await fetch(base + (base.includes('?') ? '&' : '?') + qs.toString(), { method: 'GET', redirect: 'follow' });
+            json = await parseJsonResponse(res);
+          }
+        }
+        if (json.error) throw new Error(json.error);
+        return json;
+      } catch (err) {
+        console.error('API error:', err);
+        showToast('Sheet API error: ' + err.message);
+        return null;
+      }
+    }
+
+    function saveScriptUrl() {
+      scriptUrl = document.getElementById('scriptUrl').value.trim();
+      localStorage.setItem('zalvra_script_url', scriptUrl);
+      updateConfigStatus();
+      showToast(scriptUrl ? 'Script URL saved' : 'Switched to local mode');
+      if (scriptUrl) { loadOrders(); loadProducts(); }
+    }
+
+    async function testConnection() {
+      if (!getScriptUrl()) { showToast('Enter a Script URL first'); return; }
+      showToast('Connecting & setting up sheets...');
+      const result = await apiCall('setup');
+      if (result && result.ok) {
+        showToast('Connected! Products & Orders sheets ready');
+        updateConfigStatus(true);
+        loadOrders();
+        loadProducts();
+      } else {
+        showToast('Connection failed. Check URL & deploy as Anyone.');
+        updateConfigStatus(false);
+      }
+    }
+
+    function updateConfigStatus(connected) {
+      const el = document.getElementById('configStatus');
+      const url = getScriptUrl();
+      if (!url) { el.className = 'config-status config-off'; el.textContent = 'Local mode (no Google Sheet connected)'; }
+      else if (connected === true) { el.className = 'config-status config-ok'; el.textContent = 'Connected to Google Sheets'; }
+      else if (connected === false) { el.className = 'config-status config-off'; el.textContent = 'URL saved but connection failed'; }
+      else { el.className = 'config-status config-off'; el.textContent = 'URL saved — click Test Connection'; }
+    }
+
+    async function loadOrders() {
+      const url = getScriptUrl();
+      if (url) {
+        try {
+          // Direct GET with cache-buster so admin always sees latest orders
+          const endpoint = url + (url.includes('?') ? '&' : '?') + 'action=getOrders&_=' + Date.now();
+          const res = await fetch(endpoint, { method: 'GET', redirect: 'follow' });
+          const text = await res.text();
+          const result = JSON.parse(text);
+          if (result && Array.isArray(result.orders)) {
+            orders = result.orders;
+          } else if (result && result.error) {
+            showToast('Orders load error: ' + result.error);
+            orders = JSON.parse(localStorage.getItem('zalvra_orders') || '[]');
+          }
+        } catch (err) {
+          console.error(err);
+          showToast('Could not load orders from Sheet');
+          orders = JSON.parse(localStorage.getItem('zalvra_orders') || '[]');
+        }
+      } else {
+        orders = JSON.parse(localStorage.getItem('zalvra_orders') || '[]');
+      }
+      renderOrders();
+    }
+
+    function renderOrders() {
+      document.getElementById('statOrders').textContent = orders.length;
+      const revenue = orders.filter(o => o.status !== 'cancelled').reduce((s, o) => s + (parseFloat(o.total) || 0), 0);
+      document.getElementById('statRevenue').textContent = formatPKR(revenue);
+      document.getElementById('statPending').textContent = orders.filter(o => o.status === 'new').length;
+      const list = document.getElementById('ordersList');
+      if (!orders.length) { list.innerHTML = '<div class="empty">No orders yet</div>'; return; }
+      list.innerHTML = `<table>
+        <thead><tr><th>Order</th><th>Customer</th><th>Product</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${orders.map(o => `<tr>
+          <td><strong>${o.id}</strong><br><span style="font-size:0.78rem;color:#999;">${o.date||''}</span></td>
+          <td>${o.name||''}<br><span style="font-size:0.78rem;color:#999;">${o.phone||''}${o.city ? '<br>' + o.city : ''}<br>${o.address||''}</span></td>
+          <td>${o.emoji||''} ${o.product||''} × ${o.qty||1}</td>
+          <td><strong>${formatPKR(o.total||0)}</strong><br><span style="font-size:0.78rem;color:#999;">Cash on Delivery</span></td>
+          <td><span class="status status-${o.status||'new'}">${o.status||'new'}</span></td>
+          <td><div class="actions">
+            <button class="btn btn-sm btn-outline" onclick="openStatusModal('${o.id}')">Status</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteOrder('${o.id}')">Delete</button>
+          </div></td>
+        </tr>`).join('')}</tbody></table>`;
+    }
+
+    function formatPayment(p) {
+      if (p === 'cod') return 'Cash on Delivery';
+      if (p === 'card') return 'Card';
+      if (p === 'bank') return 'Bank Transfer';
+      return p || '';
+    }
+
+    function openStatusModal(orderId) {
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return;
+      document.getElementById('statusOrderId').value = orderId;
+      document.getElementById('statusSelect').value = order.status || 'new';
+      document.getElementById('statusModal').classList.add('open');
+    }
+    function closeStatusModal() { document.getElementById('statusModal').classList.remove('open'); }
+
+    async function updateOrderStatus() {
+      const orderId = document.getElementById('statusOrderId').value;
+      const status = document.getElementById('statusSelect').value;
+      const url = getScriptUrl();
+      if (url) { const r = await apiCall('updateOrder', { orderId, status }); if (!r) return; }
+      const order = orders.find(o => o.id === orderId);
+      if (order) order.status = status;
+      if (!url) localStorage.setItem('zalvra_orders', JSON.stringify(orders));
+      closeStatusModal(); renderOrders(); showToast('Status updated to ' + status);
+    }
+
+    async function deleteOrder(orderId) {
+      if (!confirm('Delete this order permanently?')) return;
+      const url = getScriptUrl();
+      if (url) { const r = await apiCall('deleteOrder', { orderId }); if (!r) return; }
+      orders = orders.filter(o => o.id !== orderId);
+      if (!url) localStorage.setItem('zalvra_orders', JSON.stringify(orders));
+      renderOrders(); showToast('Order deleted');
+    }
+
+    async function loadProducts() {
+      const url = getScriptUrl();
+      if (url) {
+        const result = await apiCall('getProducts');
+        if (result && result.products && result.products.length) {
+          products = result.products;
+          localStorage.setItem('zalvra_products', JSON.stringify(products));
+        } else {
+          products = JSON.parse(localStorage.getItem('zalvra_products') || 'null') || [...DEFAULT_PRODUCTS];
+        }
+      } else {
+        products = JSON.parse(localStorage.getItem('zalvra_products') || 'null') || [...DEFAULT_PRODUCTS];
+      }
+      renderProducts();
+    }
+
+    function productThumb(p) {
+      const imgs = Array.isArray(p.images) ? p.images : (p.image ? [p.image] : []);
+      if (imgs.length) {
+        return `<img src="${imgs[0]}" alt="" style="width:40px;height:40px;object-fit:cover;border:1px solid #e8e4de;vertical-align:middle;margin-right:0.4rem;">`;
+      }
+      return `<span style="font-size:1.4rem;margin-right:0.3rem;">${p.emoji||'🛍'}</span>`;
+    }
+
+    function renderProducts() {
+      const list = document.getElementById('productsList');
+      if (!products.length) { list.innerHTML = '<div class="empty">No products. Click Add Product.</div>'; return; }
+      list.innerHTML = `<table>
+        <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Images</th><th>Rating</th><th>Actions</th></tr></thead>
+        <tbody>${products.map(p => {
+          const imgCount = Array.isArray(p.images) ? p.images.length : (p.image ? 1 : 0);
+          return `<tr>
+          <td>${productThumb(p)}<strong>${p.name}</strong><br><span style="font-size:0.78rem;color:#999;">ID: ${p.id}</span></td>
+          <td>${p.cat||''}</td>
+          <td><strong>${formatPKR(p.price)}</strong>${p.oldPrice ? `<br><span style="font-size:0.78rem;color:#999;text-decoration:line-through;">${formatPKR(p.oldPrice)}</span>` : ''}</td>
+          <td>${imgCount || '—'}</td>
+          <td>${p.rating||'—'}</td>
+          <td><div class="actions">
+            <button class="btn btn-sm btn-outline" onclick="editProduct(${p.id})">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteProduct(${p.id})">Delete</button>
+          </div></td>
+        </tr>`;
+        }).join('')}</tbody></table>`;
+    }
+
+    function openProductModal(product) {
+      document.getElementById('productModalTitle').textContent = product ? 'Edit Product' : 'Add Product';
+      document.getElementById('prodId').value = product ? product.id : '';
+      document.getElementById('prodName').value = product ? product.name : '';
+      document.getElementById('prodPrice').value = product ? product.price : '';
+      document.getElementById('prodOldPrice').value = product && product.oldPrice ? product.oldPrice : '';
+      document.getElementById('prodCat').value = product ? product.cat : 'men';
+      document.getElementById('prodEmoji').value = product ? (product.emoji || '') : '';
+      document.getElementById('prodRating').value = product ? (product.rating || 4.5) : 4.5;
+      document.getElementById('prodDesc').value = product ? (product.desc || '') : '';
+      document.getElementById('prodSubmitBtn').textContent = product ? 'Update Product' : 'Add Product';
+      currentImages = product && Array.isArray(product.images) ? [...product.images] : (product && product.image ? [product.image] : []);
+      renderImagePreviews();
+      document.getElementById('uploadStatus').textContent = '';
+      document.getElementById('productModal').classList.add('open');
+    }
+    function closeProductModal() {
+      document.getElementById('productModal').classList.remove('open');
+      currentImages = [];
+      document.getElementById('prodImages').value = '';
+    }
+    function editProduct(id) { const p = products.find(x => x.id == id); if (p) openProductModal(p); }
+
+    function renderImagePreviews() {
+      const container = document.getElementById('imagePreviews');
+      if (!currentImages.length) { container.innerHTML = ''; return; }
+      container.innerHTML = currentImages.map((url, i) => `
+        <div class="image-preview">
+          <img src="${url}" alt="Product image ${i + 1}" onerror="this.style.opacity=0.3">
+          <button type="button" class="remove-img" onclick="removeImage(${i})" title="Remove">×</button>
+        </div>
+      `).join('');
+    }
+
+    function removeImage(index) {
+      currentImages.splice(index, 1);
+      renderImagePreviews();
+    }
+
+    async function uploadToImgBB(file) {
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('key', IMGBB_API_KEY);
+      const res = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (!data.success || !data.data || !data.data.url) {
+        throw new Error(data.error?.message || 'Upload failed');
+      }
+      return data.data.url;
+    }
+
+    async function handleImageSelect(event) {
+      const files = Array.from(event.target.files || []);
+      if (!files.length) return;
+      const remaining = MAX_IMAGES - currentImages.length;
+      if (remaining <= 0) {
+        showToast('Maximum ' + MAX_IMAGES + ' images allowed');
+        event.target.value = '';
+        return;
+      }
+      const toUpload = files.slice(0, remaining);
+      const status = document.getElementById('uploadStatus');
+      status.textContent = 'Uploading ' + toUpload.length + ' image(s)...';
+      try {
+        for (const file of toUpload) {
+          if (!file.type.startsWith('image/')) continue;
+          if (file.size > 32 * 1024 * 1024) {
+            showToast(file.name + ' is too large (max 32MB)');
+            continue;
+          }
+          const url = await uploadToImgBB(file);
+          currentImages.push(url);
+          renderImagePreviews();
+        }
+        status.textContent = currentImages.length + ' image(s) ready';
+        showToast('Images uploaded');
+      } catch (err) {
+        console.error(err);
+        status.textContent = 'Upload error: ' + err.message;
+        showToast('Image upload failed: ' + err.message);
+      }
+      event.target.value = '';
+    }
+
+    (function setupDragDrop() {
+      setTimeout(() => {
+        const area = document.getElementById('imageUploadArea');
+        if (!area) return;
+        area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('dragover'); });
+        area.addEventListener('dragleave', () => area.classList.remove('dragover'));
+        area.addEventListener('drop', e => {
+          e.preventDefault();
+          area.classList.remove('dragover');
+          const files = e.dataTransfer.files;
+          if (files.length) {
+            const input = document.getElementById('prodImages');
+            const dt = new DataTransfer();
+            Array.from(files).forEach(f => dt.items.add(f));
+            input.files = dt.files;
+            handleImageSelect({ target: input });
+          }
+        });
+      }, 0);
+    })();
+
+    async function saveProduct(e) {
+      e.preventDefault();
+      const id = document.getElementById('prodId').value;
+      const product = {
+        id: id ? parseInt(id) : Date.now(),
+        name: document.getElementById('prodName').value.trim(),
+        price: parseFloat(document.getElementById('prodPrice').value),
+        oldPrice: document.getElementById('prodOldPrice').value ? parseFloat(document.getElementById('prodOldPrice').value) : null,
+        cat: document.getElementById('prodCat').value,
+        emoji: document.getElementById('prodEmoji').value.trim() || '🛍',
+        rating: parseFloat(document.getElementById('prodRating').value) || 4.5,
+        desc: document.getElementById('prodDesc').value.trim(),
+        images: [...currentImages]
+      };
+      const url = getScriptUrl();
+      if (url) { const r = await apiCall(id ? 'updateProduct' : 'addProduct', { product }); if (!r) return; }
+      if (id) { const idx = products.findIndex(p => p.id == id); if (idx >= 0) products[idx] = product; }
+      else products.push(product);
+      localStorage.setItem('zalvra_products', JSON.stringify(products));
+      closeProductModal(); renderProducts();
+      showToast(id ? 'Product updated' : 'Product added');
+    }
+
+    async function deleteProduct(id) {
+      if (!confirm('Delete this product permanently?')) return;
+      const url = getScriptUrl();
+      if (url) { const r = await apiCall('deleteProduct', { productId: id }); if (!r) return; }
+      products = products.filter(p => p.id != id);
+      localStorage.setItem('zalvra_products', JSON.stringify(products));
+      renderProducts(); showToast('Product deleted');
+    }
+
+    function init() {
+      document.getElementById('scriptUrl').value = scriptUrl;
+      updateConfigStatus();
+      loadOrders();
+      loadProducts();
+    }
+
+    if (sessionStorage.getItem('zalvra_admin') === '1' || localStorage.getItem('zalvra_admin_remember') === '1') {
+      if (localStorage.getItem('zalvra_admin_remember') === '1') {
+        sessionStorage.setItem('zalvra_admin', '1');
+      }
+      showDashboard();
+    }
+  </script>
+</body>
+</html>
